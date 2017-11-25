@@ -6,13 +6,25 @@ export class Tabs extends Component {
     mouseUpHandler = this.handleMouseUp.bind(this);
     tooltipTimeout = null;
     singleTabWidth = 0;
+    singleTabWidthInPercent = 0;
     tabTotal = 0;
 
     switchTab(index) {
         this.props.onTabSwitch(index);
     }
 
+    recalculateSingleTabWidth() {
+        if (this.props.maxTabWidth && this.refs.tabs) {
+            const one = this.refs.tabs.offsetWidth / 100;
+            const percentSingleTabWidth = this.singleTabWidthInPercent * one;
+            const actualSingleTabWidth = Math.min(percentSingleTabWidth, this.props.maxTabWidth);
+            this.singleTabWidth = (actualSingleTabWidth * 100) / this.refs.tabs.offsetWidth;
+        }
+    }
+
     handleMouseDown(event) {
+        this.recalculateSingleTabWidth();
+
         this.dragTarget = {
             target: event.currentTarget,
             x: event.currentTarget.offsetLeft,
@@ -30,6 +42,8 @@ export class Tabs extends Component {
     handleMouseMove(event) {
         // Draggable
         if (this.dragTarget) {
+            this.recalculateSingleTabWidth();
+
             event.preventDefault();
             event.stopPropagation();
 
@@ -78,6 +92,7 @@ export class Tabs extends Component {
     }
 
     getLeftByIndex(index) {
+        this.recalculateSingleTabWidth();
         return 1 + this.singleTabWidth * index;
     }
 
@@ -110,6 +125,7 @@ export class Tabs extends Component {
             window.addEventListener('mousemove', this.mouseMoveHandler);
             window.addEventListener('mouseup', this.mouseUpHandler);
         }
+        this.forceUpdate();
     }
 
     componentWillUnmount() {
@@ -123,6 +139,7 @@ export class Tabs extends Component {
         let props = this.props;
         this.tabTotal = props.children.length;
         this.singleTabWidth = 98 / this.tabTotal;
+        this.singleTabWidthInPercent = this.singleTabWidth;
 
         let tabs = props.children.map((tab, index) => {
             let style = {};
@@ -141,6 +158,10 @@ export class Tabs extends Component {
             style['left'] = this.getLeftByIndex(position) + '%';
             style['width'] = this.singleTabWidth + '%';
 
+            if (props.maxTabWidth) {
+                style['maxWidth'] = props.maxTabWidth + 'px';
+            }
+
             if (this.dragTarget && this.dragTarget.index == position) {
                 style['left'] = this.dragTarget.left;
             }
@@ -149,24 +170,24 @@ export class Tabs extends Component {
 
             return (
                 <div
-					key={ index } 
-					className={ "tab-button" + (props.active == index ? " active" : "") }
-					style={ style } 
-					onClick={ this.switchTab.bind(this, index) }
-					onMouseDown={ this.handleMouseDown.bind(this) }
-					onMouseEnter={ hideTabTooltip ? null : this.showTooltip.bind(this, tab.props.tooltip) }
-					onMouseLeave={ hideTabTooltip ? null : this.hideTooltip.bind(this) }
-				>
-					<div 
-						className="tab"
-						style={ this.props.color ? { borderColor: this.props.color } : null }
-					></div>
-					<div className={ "text" + (tab.props.showClose ? " with-close" : "") }>
-						{ icon }
-						{ tab.props.title }
-					</div>
-					{ tab.props.showClose ? (<div className="close" onClick={ this.handleClose.bind(this, index) }></div>) : null }
-				</div>
+                    key={ index } 
+                    className={ "tab-button" + (props.active == index ? " active" : "") }
+                    style={ style } 
+                    onClick={ this.switchTab.bind(this, index) }
+                    onMouseDown={ this.handleMouseDown.bind(this) }
+                    onMouseEnter={ hideTabTooltip ? null : this.showTooltip.bind(this, tab.props.tooltip) }
+                    onMouseLeave={ hideTabTooltip ? null : this.hideTooltip.bind(this) }
+                >
+                    <div 
+                        className="tab"
+                        style={ this.props.color ? { borderColor: this.props.color } : null }
+                    ></div>
+                    <div className={ "text" + (tab.props.showClose ? " with-close" : "") }>
+                        { icon }
+                        { tab.props.title }
+                    </div>
+                    { tab.props.showClose ? (<div className="close" onClick={ this.handleClose.bind(this, index) }></div>) : null }
+                </div>
             );
         });
 
@@ -177,33 +198,33 @@ export class Tabs extends Component {
 
             return (
                 <div 
-					className="panel active"
-					key={ "panel-" + index }
-				>
-					{ panel }
-				</div>
+                    className="panel active"
+                    key={ "panel-" + index }
+                >
+                    { panel }
+                </div>
             );
         });
 
         return (
             <div 
-				className="r-a-t"
-			>
-				<div className={ "tab-wrapper" + (this.props.showAdd ? " with-add" : "") } ref="tabs">
-					{ tabs }
-				</div>
-				{
-					(this.props.showAdd) ? (<div className="add-wrapper" onClick={ this.handleAdd.bind(this) }></div>) : null
-				}
-				<div 
-					className="panel-wrapper"
-					style={ this.props.color ? { borderColor: this.props.color } : null }
-				>
-					{ panels }
-				</div>
-				<div className="tooltip" ref="tooltip">
-				</div>
-			</div>
+                className="r-a-t"
+            >
+                <div className={ "tab-wrapper" + (this.props.showAdd ? " with-add" : "") } ref="tabs">
+                    { tabs }
+                </div>
+                {
+                    (this.props.showAdd) ? (<div className="add-wrapper" onClick={ this.handleAdd.bind(this) }></div>) : null
+                }
+                <div 
+                    className="panel-wrapper"
+                    style={ this.props.color ? { borderColor: this.props.color } : null }
+                >
+                    { panels }
+                </div>
+                <div className="tooltip" ref="tooltip">
+                </div>
+            </div>
         );
     }
 }
@@ -217,8 +238,8 @@ const Tab = ({ children }) => {
 const TabIcon = ({ type }) => {
     return (
         <div className={ "icon " + type }>
-			{ type == 'loading' ? (<div className="mask"></div>) : null }
-		</div>
+            { type == 'loading' ? (<div className="mask"></div>) : null }
+        </div>
     );
 };
 

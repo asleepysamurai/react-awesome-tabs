@@ -19,6 +19,7 @@ Live demo and get started @[react-awesome-tabs](http://gao-sun.github.io/react-a
 |showAdd|Boolean|Show the add button in the right. **onTabAdd** is required.|
 |color|String|Change the border color.|
 |hideTooltip|Boolean|Hide tooltips for all tabs.|
+|maxTabWidth|Number|Maximum possible width of each individual tab in pixels.|
 #### Functions
 |Property Name|Parameter|Description|
 |---|---|---|
