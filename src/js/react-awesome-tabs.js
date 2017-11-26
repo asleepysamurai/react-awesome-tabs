@@ -192,13 +192,9 @@ export class Tabs extends Component {
         });
 
         let panels = props.children.map((panel, index) => {
-            if (props.active != index) {
-                return null;
-            }
-
             return (
                 <div 
-                    className="panel active"
+                    className={ `panel ${props.active == index ? 'active' : ''}` }
                     key={ "panel-" + index }
                 >
                     { panel }
