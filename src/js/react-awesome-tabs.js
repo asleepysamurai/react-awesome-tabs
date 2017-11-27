@@ -170,7 +170,7 @@ export class Tabs extends Component {
 
             return (
                 <div
-                    key={ index } 
+                    key={ tab.props.id } 
                     className={ "tab-button" + (props.active == index ? " active" : "") }
                     style={ style } 
                     onClick={ this.switchTab.bind(this, index) }
@@ -191,17 +191,6 @@ export class Tabs extends Component {
             );
         });
 
-        let panels = props.children.map((panel, index) => {
-            return (
-                <div 
-                    className={ `panel ${props.active == index ? 'active' : ''}` }
-                    key={ "panel-" + index }
-                >
-                    { panel }
-                </div>
-            );
-        });
-
         return (
             <div 
                 className="r-a-t"
@@ -212,12 +201,6 @@ export class Tabs extends Component {
                 {
                     (this.props.showAdd) ? (<div className="add-wrapper" onClick={ this.handleAdd.bind(this) }></div>) : null
                 }
-                <div 
-                    className="panel-wrapper"
-                    style={ this.props.color ? { borderColor: this.props.color } : null }
-                >
-                    { panels }
-                </div>
                 <div className="tooltip" ref="tooltip">
                 </div>
             </div>
